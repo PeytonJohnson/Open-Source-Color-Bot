@@ -1,0 +1,35 @@
+{$i reflection/reflection.simba}
+//Draws NPC's ID, Name, and Combat level to screen until music tab is open
+var
+c1:TMufasaBitmap;
+W,H: Int32;
+
+Procedure DoTheThing;
+var
+  I:Int32;
+  NPCs: Array of RSNPC;
+  NPCDefinition: RSNPCDefinition;
+begin
+  NPCs := RSNPC.AllNPCs;
+  For I := 0 to high(NPCs) do
+  begin
+    NPCDefinition := NPCs[I].Definition;
+    c1.DrawTextLines([inttostr(NPCDefinition.ID),NPCDefinition.Name,inttostr(NPCDefinition.CombatLevel)],(NPCs[I].Tile.ToLocal.TiletoMS),'StatChars07',true,$FF);
+    NPCDefinition.Free;
+  end;
+  RSTypeArray(NPCs).Free;
+end;
+
+begin
+  ClearDebug;
+  GetClientDimensions(W, H);
+  EIOS_SetGraphicsDebugging(R_EIOS, True);
+  c1.Init(Client.GetMBitmaps);
+  c1.SetPersistentMemory(PtrUInt(EIOS_GetDebugImageBuffer(R_EIOS)), W, H);
+  repeat
+    DoTheThing;
+    Sleep(50);
+    c1.Clear;
+  Until(R_IsGameTabOpen(13));
+c1.free;
+end. 
